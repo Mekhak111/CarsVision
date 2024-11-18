@@ -18,15 +18,17 @@ struct LunchScreen: View {
             .font(.extraLargeTitle2)
             .foregroundStyle(Color.gray)
           
-          
-          HStack {
-            ForEach(NissanModel.allCases, id: \.name) { carType in
-              CarCardView(model: carType)
-                .padding(16)
+          ScrollView(.horizontal) {
+            HStack {
+              ForEach(NissanModel.allCases, id: \.name) { carType in
+                CarCardView(model: carType)
+                  .padding(16)
+                  .frame(maxWidth: 400)
+              }
             }
-          }
-          .navigationDestination(for: NissanModel.self) { module in
-            CarDetailsScreen(carModel: module)
+            .navigationDestination(for: NissanModel.self) { module in
+              CarDetailsScreen(carModel: module)
+            }
           }
           
         }

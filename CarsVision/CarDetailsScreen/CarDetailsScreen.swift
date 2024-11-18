@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CarDetailsScreen: View {
+  @Environment(\.openWindow) private var openWindow
+  @Environment(\.dismissWindow) private var dismissWindow
   
   var carModel: NissanModel
   
@@ -29,19 +31,22 @@ struct CarDetailsScreen: View {
           Text(carModel.technicalSpecifications)
             .foregroundStyle(Color.white)
             .font(.title2)
+          
+          Button {
+            openWindow(id: "Car")
+          } label: {
+            Text("Show 3D Model")
+          }
         }
         Image("nissan.gtr")
             .resizable()
             .scaledToFit()
           }
       .padding()
-     
-//        .resizable()
-////        .scaledToFill()
-//        .accessibility(hidden: true)
+
     }
 }
 
 #Preview {
-  CarDetailsScreen(carModel: .gtr)
+  CarDetailsScreen(carModel: .kicks2019)
 }
