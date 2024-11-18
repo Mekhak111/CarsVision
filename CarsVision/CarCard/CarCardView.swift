@@ -31,10 +31,10 @@ struct CarCardView: View {
 
 #Preview {
   HStack {
-    CarCardView(model: .gtr)
-    CarCardView(model: .altima)
-    CarCardView(model: .rogue)
-    CarCardView(model: .leaf)
+    CarCardView(model: .fairladyZRZ34_2023)
+    CarCardView(model: .kicks2019)
+    CarCardView(model: .kicks2021)
+    CarCardView(model: .muranoHybrid2015)
   }
   
 }

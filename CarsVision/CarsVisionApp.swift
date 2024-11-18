@@ -13,10 +13,17 @@ struct CarsVisionApp: App {
     @State private var appModel = AppModel()
 
     var body: some Scene {
+      
         WindowGroup {
           LunchScreen()
                 .environment(appModel)
         }
+      
+      WindowGroup(id: "Car") {
+        Car3dView()
+          .environment(appModel)
+      }.windowStyle(.volumetric)
+     
 
         ImmersiveSpace(id: appModel.immersiveSpaceID) {
             ImmersiveView()
