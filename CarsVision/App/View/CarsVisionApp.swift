@@ -6,35 +6,23 @@
 //
 
 import SwiftUI
+import RealityKit
 
 @main
 struct CarsVisionApp: App {
 
-    @State private var appModel = AppModel()
+  @State private var appModel = AppModel()
 
-    var body: some Scene {
-      
-        WindowGroup {
-          LunchScreen()
-                .environment(appModel)
-        }
-      
-      WindowGroup(id: "Car") {
-        Car3dView()
-          .environment(appModel)
-      }.windowStyle(.volumetric)
-     
-
-        ImmersiveSpace(id: appModel.immersiveSpaceID) {
-            ImmersiveView()
-                .environment(appModel)
-                .onAppear {
-                    appModel.immersiveSpaceState = .open
-                }
-                .onDisappear {
-                    appModel.immersiveSpaceState = .closed
-                }
-        }
-        .immersionStyle(selection: .constant(.full), in: .full)
+  var body: some SwiftUI.Scene {
+    WindowGroup {
+      LunchScreen()
+        .environment(appModel)
     }
+    
+    ImmersiveSpace(id: appModel.immersiveSpaceID) {
+      CarModel()
+        .environment(appModel)
+    }
+  }
+  
 }

@@ -11,11 +11,15 @@ import SwiftUI
 @MainActor
 @Observable
 class AppModel {
-    let immersiveSpaceID = "ImmersiveSpace"
-    enum ImmersiveSpaceState {
-        case closed
-        case inTransition
-        case open
-    }
-    var immersiveSpaceState = ImmersiveSpaceState.closed
+  
+  enum ImmersiveSpaceState {
+    case closed
+    case inTransition
+    case open
+  }
+
+  var carModel: NissanModel = .z350
+  var immersiveSpaceState = ImmersiveSpaceState.closed
+  let immersiveSpaceID = "ImmersiveSpace"
+  
 }
