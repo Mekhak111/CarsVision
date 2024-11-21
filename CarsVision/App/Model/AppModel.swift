@@ -21,5 +21,8 @@ class AppModel {
   var carModel: NissanModel = .z350
   var immersiveSpaceState = ImmersiveSpaceState.closed
   let immersiveSpaceID = "ImmersiveSpace"
+  var materials: [String] = []
+  var selectedMaterial: String = "Car"
+  var selectedColor: Color = .red
   
 }

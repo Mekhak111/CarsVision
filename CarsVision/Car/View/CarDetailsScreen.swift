@@ -10,6 +10,7 @@ import SwiftUI
 struct CarDetailsScreen: View {
 
   @State private var isShowModel: Bool = false
+  @State private var isShowImmersive: Bool = false
 
   @Environment(\.openWindow) private var openWindow
   @Environment(\.dismissWindow) private var dismissWindow
@@ -37,13 +38,24 @@ struct CarDetailsScreen: View {
         Text(carModel.technicalSpecifications)
           .foregroundStyle(Color.white)
           .font(.title2)
+        HStack {
+          Button {
+            isShowModel.toggle()
+            appModel.carModel = carModel
+            showWindow()
+          } label: {
+            Text(isShowModel ? "Dismiss 3D Model" : "Show 3D Model")
+          }
+          
+          Button {
+            isShowImmersive.toggle()
+            appModel.carModel = carModel
+            showImmersiveSpace()
+          } label: {
+            Text(isShowImmersive ? "Dismiss Imersive" : "Show Imersive")
+          }
 
-        Button {
-          isShowModel.toggle()
-          appModel.carModel = carModel
-          showImmersiveSpace() // or showWindow()
-        } label: {
-          Text(isShowModel ? "Dismiss 3D Model" : "Show 3D Model")
+          
         }
       }
       Image("nissan.gtr")
@@ -62,7 +74,7 @@ struct CarDetailsScreen: View {
   }
 
   private func showImmersiveSpace() {
-    if isShowModel {
+    if isShowImmersive {
       Task {
         await openImmersiveSpace(id: appModel.immersiveSpaceID)
       }
