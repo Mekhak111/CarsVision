@@ -11,17 +11,19 @@ struct LunchScreen: View {
     var body: some View {
       NavigationStack {
         VStack {
-          Text("Find Your Nissan")
-            .font(.extraLargeTitle)
-            .foregroundStyle(Color.gray)
-          Text("Adventure calls")
-            .font(.extraLargeTitle2)
-            .foregroundStyle(Color.gray)
+            Text("Find Your Nissan")
+              .font(.extraLargeTitle)
+              .foregroundStyle(Color.white)
+            
+            Text("Adventure calls")
+              .font(.extraLargeTitle2)
+              .foregroundStyle(Color.white)
           
           ScrollView(.horizontal) {
             HStack {
               ForEach(NissanModel.allCases, id: \.name) { carType in
                 CarCardView(model: carType)
+                  .glassBackgroundEffect()
                   .padding(16)
                   .frame(maxWidth: 400)
               }
