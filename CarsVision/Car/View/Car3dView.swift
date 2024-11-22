@@ -12,85 +12,109 @@ struct CarModel: View {
   
   @Environment(\.appModel) private var appModel
   @Environment(\.openWindow) private var openWindow
+  @Environment(\.dismissWindow) private var dismissWindow
+  
+  @State var carEnt:ModelEntity = ModelEntity()
+  @State var rotationA: Angle = .zero
+  @State var transformMatrix: Transform = Transform()
+  @State var isPickerOPened: Bool = false
   
   @State private var copies:[String] = []
   
-  @State var carEnt:ModelEntity? = nil
-  
   var body: some View {
-    GeometryReader3D { geometry in
       RealityView { content, attachments in
         if let car = try? await ModelEntity(named: appModel.carModel.modelName)
         {
-          let bounds = content.convert(
-            geometry.frame(in: .local),
-            from: .local,
-            to: content
-          )
-          let minExtent = bounds.extents.min()
-          car.scale = [minExtent * 0.01, minExtent * 0.01, minExtent * 0.01]
-          
-          
           let carAnchor = AnchorEntity(world: [0, -1, -2])
+          
           if let pickkerAttachment = attachments.entity(for: "ColorPicker") {
-            pickkerAttachment.position = [1, 0, 0]
+            pickkerAttachment.position = [2, 1, 0]
+            pickkerAttachment.scale = [10,10,10]
             carAnchor.addChild(pickkerAttachment)
           }
+          
           carEnt = car
-          carAnchor.addChild(carEnt ?? car)
-          
+          let sizes = getSizes()
+          let scale = calculateScale(for: sizes)
+          carEnt.scale = [Float(scale), Float(scale), Float(scale)]
+          transformMatrix = carEnt.transform
+          carAnchor.addChild(carEnt)
           content.add(carAnchor)
-          
           car.model?.materials.forEach {
             appModel.materials.append($0.name ?? "")
             copies.append($0.name ?? "")
           }
-          
-          
         }
+      } update: { content, attachments in
+        carEnt.components.set(InputTargetComponent())
+        carEnt.generateCollisionShapes(recursive: false)
       } attachments: {
-        Attachment(id: "ColorPicker") {
-          Button{
-            openWindow.callAsFunction(id: "Picker")
-          } label: {
-            Text("Choose material to change color")
-              .font(.title)
-              .frame(width: 200)
-          }
-        }
+        attachment
       }
+      .gesture(dragGesture)
       .onDisappear {
         appModel.selectedColor = .clear
         appModel.selectedMaterial = ""
         appModel.materials.removeAll()
       }
       .onChange(of: appModel.selectedColor) { oldValue, newValue in
-        for i in 0..<(carEnt?.model?.materials.count ?? 0) {
+        for i in 0..<(carEnt.model?.materials.count ?? 0) {
           if copies[i] == appModel.selectedMaterial {
-            carEnt?.model?.materials[i] = SimpleMaterial(color: SimpleMaterial.Color(newValue), isMetallic: false)
+            carEnt.model?.materials[i] = SimpleMaterial(color: SimpleMaterial.Color(newValue), isMetallic: false)
           }
         }
       }
     }
-  }
   
 }
 
-struct CarModelInVolumetric: View {
+extension CarModel {
   
-  @Environment(\.appModel) private var appModel
-  
-  var body: some View {
-    Model3D(named: appModel.carModel.modelName) { car in
-      car
-        .resizable()
-    } placeholder: {
-      ProgressView()
-        .progressViewStyle(.circular)
+  private var attachment: Attachment<some View> {
+    Attachment(id: "ColorPicker") {
+      Button{
+        if isPickerOPened {
+          dismissWindow.callAsFunction(id: "Picker")
+        } else {
+          openWindow.callAsFunction(id: "Picker")
+        }
+        isPickerOPened.toggle()
+      } label: {
+        Text(isPickerOPened ? "Close Picker" : "Open Picker")
+          .font(.title)
+          .frame(width: 200)
+      }
     }
   }
   
+  private var dragGesture: some Gesture {
+    DragGesture()
+      .targetedToEntity(carEnt)
+      .onChanged { change in
+        print("rotate")
+        print(change.translation)
+        rotationA.degrees += change.translation.width > 0 ? 3 : -3
+        var m1 = Transform(yaw: Float(rotationA.radians))
+        m1.scale = transformMatrix.scale
+        carEnt.transform.matrix = m1.matrix
+      }
+
+  }
+  
+  private func getSizes() -> [Double] {
+    let width = (carEnt.model?.mesh.bounds.max.x)! - (carEnt.model?.mesh.bounds.min.x)!
+    let height = (carEnt.model?.mesh.bounds.max.y)! - (carEnt.model?.mesh.bounds.min.y)!
+    let depth = (carEnt.model?.mesh.bounds.max.z)! - (carEnt.model?.mesh.bounds.min.z)!
+    let carSize: [Double] = [ Double(width) , Double(height), Double(depth)]
+    return carSize
+  }
+  
+  private func calculateScale(for array: [Double]) -> Double {
+    guard let maxElement = array.max(), maxElement > 0 else {
+      fatalError("Array must not be empty and should contain positive values.")
+    }
+    let scaleFactor = 5.0 / maxElement
+    return scaleFactor
+  }
+  
 }
-
-
-
