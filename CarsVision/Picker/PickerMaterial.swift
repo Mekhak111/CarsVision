@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct PickerMaterial: View {
-  
+
   @Environment(\.appModel) private var appModel
   @State var selectedMaterial: String = "Part Picker"
   @State var partColor: Color = .white
-  
+
   var body: some View {
     VStack {
       Text("Choose Part")
@@ -22,7 +22,7 @@ struct PickerMaterial: View {
           Text($0)
         }
       }
-      .padding(.bottom,50)
+      .padding(.bottom, 50)
       ColorPicker("", selection: $partColor)
         .padding(.horizontal, 50)
     }
@@ -33,5 +33,5 @@ struct PickerMaterial: View {
       appModel.selectedColor = color
     }
   }
-  
+
 }

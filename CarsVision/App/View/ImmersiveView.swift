@@ -28,6 +28,7 @@ struct ImmersiveView: View {
       }
     }
   }
+
 }
 
 #Preview(immersionStyle: .full) {
