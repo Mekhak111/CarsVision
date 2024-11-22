@@ -1,5 +1,5 @@
 //
-//  Car3dView.swift
+//  Car3DView.swift
 //  CarsVision
 //
 //  Created by Mekhak Ghapantsyan on 11/15/24.
@@ -8,49 +8,15 @@
 import RealityKit
 import SwiftUI
 
-struct CarModel: View {
-  
+struct Car3DView: View {
+
   @Environment(\.appModel) private var appModel
   @Environment(\.openWindow) private var openWindow
   @Environment(\.dismissWindow) private var dismissWindow
-  
-  @State var carEnt:ModelEntity = ModelEntity()
-  @State var rotationA: Angle = .zero
-  @State var transformMatrix: Transform = Transform()
-  @State var isPickerOPened: Bool = false
-  
-  @State private var copies:[String] = []
-  
+  @State private var viewModel = Car3DViewModel()
+
   var body: some View {
-      RealityView { content, attachments in
-        if let car = try? await ModelEntity(named: appModel.carModel.modelName)
-        {
-          let carAnchor = AnchorEntity(world: [0, -1, -2])
-          
-          if let pickkerAttachment = attachments.entity(for: "ColorPicker") {
-            pickkerAttachment.position = [2, 1, 0]
-            pickkerAttachment.scale = [10,10,10]
-            carAnchor.addChild(pickkerAttachment)
-          }
-          
-          carEnt = car
-          let sizes = getSizes()
-          let scale = calculateScale(for: sizes)
-          carEnt.scale = [Float(scale), Float(scale), Float(scale)]
-          transformMatrix = carEnt.transform
-          carAnchor.addChild(carEnt)
-          content.add(carAnchor)
-          car.model?.materials.forEach {
-            appModel.materials.append($0.name ?? "")
-            copies.append($0.name ?? "")
-          }
-        }
-      } update: { content, attachments in
-        carEnt.components.set(InputTargetComponent())
-        carEnt.generateCollisionShapes(recursive: false)
-      } attachments: {
-        attachment
-      }
+    car3DContent
       .gesture(dragGesture)
       .onDisappear {
         appModel.selectedColor = .clear
@@ -58,63 +24,79 @@ struct CarModel: View {
         appModel.materials.removeAll()
       }
       .onChange(of: appModel.selectedColor) { oldValue, newValue in
-        for i in 0..<(carEnt.model?.materials.count ?? 0) {
-          if copies[i] == appModel.selectedMaterial {
-            carEnt.model?.materials[i] = SimpleMaterial(color: SimpleMaterial.Color(newValue), isMetallic: false)
+        for i in 0..<(viewModel.carEnt.model?.materials.count ?? 0) {
+          if viewModel.copies[i] == appModel.selectedMaterial {
+            viewModel.carEnt.model?.materials[i] = SimpleMaterial(
+              color: SimpleMaterial.Color(newValue), isMetallic: false)
           }
         }
       }
-    }
-  
+  }
+
 }
 
-extension CarModel {
-  
+extension Car3DView {
+
+  private var car3DContent: some View {
+    RealityView { content, attachments in
+      if let car = try? await ModelEntity(named: appModel.carModel.modelName) {
+        let carAnchor = AnchorEntity(world: [0, -1, -2])
+
+        if let pickkerAttachment = attachments.entity(for: "ColorPicker") {
+          pickkerAttachment.position = [2, 1, 0]
+          pickkerAttachment.scale = [10, 10, 10]
+          carAnchor.addChild(pickkerAttachment)
+        }
+
+        viewModel.carEnt = car
+        let sizes = viewModel.getSizes()
+        let scale = viewModel.calculateScale(for: sizes)
+        viewModel.carEnt.scale = [Float(scale), Float(scale), Float(scale)]
+        viewModel.transformMatrix = viewModel.carEnt.transform
+        carAnchor.addChild(viewModel.carEnt)
+        content.add(carAnchor)
+        car.model?.materials.forEach {
+          appModel.materials.append($0.name ?? "")
+          viewModel.copies.append($0.name ?? "")
+        }
+      }
+    } update: { content, attachments in
+      viewModel.carEnt.components.set(InputTargetComponent())
+      viewModel.carEnt.generateCollisionShapes(recursive: false)
+    } attachments: {
+      attachment
+    }
+  }
+
   private var attachment: Attachment<some View> {
     Attachment(id: "ColorPicker") {
-      Button{
-        if isPickerOPened {
+      Button {
+        if viewModel.isPickerOpened {
           dismissWindow.callAsFunction(id: "Picker")
         } else {
           openWindow.callAsFunction(id: "Picker")
         }
-        isPickerOPened.toggle()
+        viewModel.isPickerOpened.toggle()
       } label: {
-        Text(isPickerOPened ? "Close Picker" : "Open Picker")
+        Text(viewModel.isPickerOpened ? "Close Picker" : "Open Picker")
           .font(.title)
           .frame(width: 200)
       }
     }
   }
-  
+
   private var dragGesture: some Gesture {
     DragGesture()
-      .targetedToEntity(carEnt)
+      .targetedToEntity(viewModel.carEnt)
       .onChanged { change in
         print("rotate")
         print(change.translation)
-        rotationA.degrees += change.translation.width > 0 ? 3 : -3
-        var m1 = Transform(yaw: Float(rotationA.radians))
-        m1.scale = transformMatrix.scale
-        carEnt.transform.matrix = m1.matrix
+        viewModel.rotationA.degrees += change.translation.width > 0 ? 3 : -3
+        var m1 = Transform(yaw: Float(viewModel.rotationA.radians))
+        m1.scale = viewModel.transformMatrix.scale
+        viewModel.carEnt.transform.matrix = m1.matrix
       }
 
-  }
-  
-  private func getSizes() -> [Double] {
-    let width = (carEnt.model?.mesh.bounds.max.x)! - (carEnt.model?.mesh.bounds.min.x)!
-    let height = (carEnt.model?.mesh.bounds.max.y)! - (carEnt.model?.mesh.bounds.min.y)!
-    let depth = (carEnt.model?.mesh.bounds.max.z)! - (carEnt.model?.mesh.bounds.min.z)!
-    let carSize: [Double] = [ Double(width) , Double(height), Double(depth)]
-    return carSize
-  }
-  
-  private func calculateScale(for array: [Double]) -> Double {
-    guard let maxElement = array.max(), maxElement > 0 else {
-      fatalError("Array must not be empty and should contain positive values.")
-    }
-    let scaleFactor = 5.0 / maxElement
-    return scaleFactor
   }
   
 }

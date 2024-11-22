@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct GarageSystem: View {
+  
   @Environment(\.appModel) var appModel
+  
   var body: some View {
     ZStack {
-      CarModel()
+      Car3DView()
       Garage()
     }
   }
+  
 }
 
 #Preview {

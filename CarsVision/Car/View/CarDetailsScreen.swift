@@ -9,53 +9,51 @@ import SwiftUI
 
 struct CarDetailsScreen: View {
 
-  @State private var isShowModel: Bool = false
-  @State private var isShowImmersive: Bool = false
-
   @Environment(\.openWindow) private var openWindow
   @Environment(\.dismissWindow) private var dismissWindow
   @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
   @Environment(\.openImmersiveSpace) private var openImmersiveSpace
   @Environment(\.appModel) private var appModel
-
-  var carModel: NissanModel
+  @State private var viewModel: CarDetailsViewModel
+  
+  init(viewModel: CarDetailsViewModel) {
+    self.viewModel = viewModel
+  }
 
   var body: some View {
     HStack {
       VStack(alignment: .leading, spacing: 20) {
-        Text(carModel.name)
+        Text(viewModel.carModel.name)
           .font(.extraLargeTitle)
           .foregroundStyle(Color.white)
 
-        Text(carModel.description)
+        Text(viewModel.carModel.description)
           .font(.extraLargeTitle2)
           .foregroundStyle(Color.white)
 
-        Text("HP \(carModel.horsepower)")
+        Text("HP \(viewModel.carModel.horsepower)")
           .font(.title)
           .foregroundStyle(Color.white)
 
-        Text(carModel.technicalSpecifications)
+        Text(viewModel.carModel.technicalSpecifications)
           .foregroundStyle(Color.white)
           .font(.title2)
         HStack {
           Button {
-            isShowModel.toggle()
-            appModel.carModel = carModel
+            viewModel.isShowModel.toggle()
+            appModel.carModel = viewModel.carModel
             showWindow()
           } label: {
-            Text(isShowModel ? "Dismiss 3D Model" : "Show 3D Model")
+            Text(viewModel.isShowModel ? "Dismiss 3D Model" : "Show 3D Model")
           }
           
           Button {
-            isShowImmersive.toggle()
-            appModel.carModel = carModel
+            viewModel.isShowImmersive.toggle()
+            appModel.carModel = viewModel.carModel
             showImmersiveSpace()
           } label: {
-            Text(isShowImmersive ? "Dismiss Imersive" : "Show Imersive")
+            Text(viewModel.isShowImmersive ? "Dismiss Imersive" : "Show Imersive")
           }
-
-          
         }
       }
       Image("nissan.gtr")
@@ -66,7 +64,7 @@ struct CarDetailsScreen: View {
   }
 
   private func showWindow() {
-    if isShowModel {
+    if viewModel.isShowModel {
       openWindow(id: "Car")
     } else {
       dismissWindow(id: "Car")
@@ -74,7 +72,7 @@ struct CarDetailsScreen: View {
   }
 
   private func showImmersiveSpace() {
-    if isShowImmersive {
+    if viewModel.isShowImmersive {
       Task {
         await openImmersiveSpace(id: appModel.immersiveSpaceID)
       }
@@ -88,5 +86,5 @@ struct CarDetailsScreen: View {
 }
 
 #Preview {
-  CarDetailsScreen(carModel: .kicks2019)
+  CarDetailsScreen(viewModel: CarDetailsViewModel(carModel: NissanModel.fairladyZRZ34_2023))
 }
