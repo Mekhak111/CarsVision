@@ -16,6 +16,7 @@ class Car3DViewModel {
   var rotationA: Angle = .zero
   var transformMatrix: Transform = Transform()
   var isPickerOpened: Bool = false
+  var isWheelsOpens: Bool = false
   
   func getSizes() -> [Double] {
     let width =

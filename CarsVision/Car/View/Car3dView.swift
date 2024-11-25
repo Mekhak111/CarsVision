@@ -9,12 +9,12 @@ import RealityKit
 import SwiftUI
 
 struct Car3DView: View {
-
+  
   @Environment(\.appModel) private var appModel
   @Environment(\.openWindow) private var openWindow
   @Environment(\.dismissWindow) private var dismissWindow
   @State private var viewModel = Car3DViewModel()
-
+  
   var body: some View {
     car3DContent
       .gesture(dragGesture)
@@ -26,39 +26,41 @@ struct Car3DView: View {
       .onChange(of: appModel.selectedColor) { oldValue, newValue in
         for i in 0..<(viewModel.carEnt.model?.materials.count ?? 0) {
           if viewModel.copies[i] == appModel.selectedMaterial {
-            viewModel.carEnt.model?.materials[i] = SimpleMaterial(
-              color: SimpleMaterial.Color(newValue), isMetallic: false)
+            viewModel.carEnt.model?.materials[i] = SimpleMaterial(color: SimpleMaterial.Color(newValue), isMetallic: false)
           }
         }
       }
   }
-
+  
 }
 
 extension Car3DView {
 
   private var car3DContent: some View {
     RealityView { content, attachments in
-      if let car = try? await ModelEntity(named: appModel.carModel.modelName) {
-        let carAnchor = AnchorEntity(world: [0, -1, -2])
-
+      if let car = try? await ModelEntity(named: appModel.carModel.modelName)
+      {
+        let carAnchor = AnchorEntity(world: [0, -1, -5])
+        
         if let pickkerAttachment = attachments.entity(for: "ColorPicker") {
           pickkerAttachment.position = [2, 1, 0]
-          pickkerAttachment.scale = [10, 10, 10]
+          pickkerAttachment.scale = [10,10,10]
           carAnchor.addChild(pickkerAttachment)
         }
-
+        
         viewModel.carEnt = car
         let sizes = viewModel.getSizes()
         let scale = viewModel.calculateScale(for: sizes)
         viewModel.carEnt.scale = [Float(scale), Float(scale), Float(scale)]
         viewModel.transformMatrix = viewModel.carEnt.transform
         carAnchor.addChild(viewModel.carEnt)
-        content.add(carAnchor)
         car.model?.materials.forEach {
+          
           appModel.materials.append($0.name ?? "")
           viewModel.copies.append($0.name ?? "")
         }
+        content.add(carAnchor)
+        
       }
     } update: { content, attachments in
       viewModel.carEnt.components.set(InputTargetComponent())
@@ -68,19 +70,53 @@ extension Car3DView {
     }
   }
 
+
   private var attachment: Attachment<some View> {
     Attachment(id: "ColorPicker") {
-      Button {
-        if viewModel.isPickerOpened {
-          dismissWindow.callAsFunction(id: "Picker")
+      VStack {
+        if !viewModel.isWheelsOpens && !viewModel.isPickerOpened {
+          Button{
+            if viewModel.isPickerOpened {
+              dismissWindow.callAsFunction(id: "Picker")
+            } else {
+              openWindow.callAsFunction(id: "Picker")
+            }
+            viewModel.isPickerOpened.toggle()
+          } label: {
+            Text(viewModel.isPickerOpened ? "Close Picker" : "Open Picker")
+              .font(.title)
+              .frame(width: 200)
+          }
+          
+          Button {
+            if viewModel.isWheelsOpens {
+              dismissWindow.callAsFunction(id: "Wheels")
+            } else {
+              openWindow.callAsFunction(id: "Wheels")
+            }
+            viewModel.isWheelsOpens.toggle()
+          } label: {
+            Text("Choose Wheels")
+              .font(.title)
+              .frame(width: 200)
+          }
+          
         } else {
-          openWindow.callAsFunction(id: "Picker")
+          Button {
+            if viewModel.isWheelsOpens {
+              dismissWindow.callAsFunction(id: "Wheels")
+              viewModel.isWheelsOpens.toggle()
+            } else {
+              dismissWindow.callAsFunction(id: "Picker")
+              viewModel.isPickerOpened.toggle()
+            }
+          } label: {
+            Text("Close Whindows")
+              .font(.title)
+              .frame(width: 200)
+          }
+          
         }
-        viewModel.isPickerOpened.toggle()
-      } label: {
-        Text(viewModel.isPickerOpened ? "Close Picker" : "Open Picker")
-          .font(.title)
-          .frame(width: 200)
       }
     }
   }
@@ -96,7 +132,6 @@ extension Car3DView {
         m1.scale = viewModel.transformMatrix.scale
         viewModel.carEnt.transform.matrix = m1.matrix
       }
-
   }
   
 }

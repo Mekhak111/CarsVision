@@ -10,9 +10,9 @@ import SwiftUI
 
 @main
 struct CarsVisionApp: App {
-
+  
   @State private var appModel = AppModel()
-
+  
   var body: some SwiftUI.Scene {
     WindowGroup {
       LunchScreen()
@@ -24,17 +24,24 @@ struct CarsVisionApp: App {
         .environment(appModel)
     }
     .windowStyle(.volumetric)
-
+    .defaultSize(CGSize(width: 600, height: 600))
+    
     WindowGroup(id: "Picker") {
       PickerMaterial()
         .environment(appModel)
         .presentationCornerRadius(20)
         .glassBackgroundEffect()
-
     }
     .windowStyle(.plain)
     .defaultSize(CGSize(width: 400, height: 400))
-
+    
+    WindowGroup(id: "Wheels") {
+      WheelsSelectionView()
+        .environment(appModel)
+    }
+    .windowStyle(.volumetric)
+    .defaultSize(CGSize(width: 600, height: 600))
+    
     ImmersiveSpace(id: appModel.immersiveSpaceID) {
       GarageSystem()
         .environment(appModel)
