@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct CarCardView: View {
+
   let model: NissanModel
+
   var body: some View {
     NavigationLink(value: model) {
-      
       VStack {
         Text(model.name)
           .font(.title)
@@ -25,8 +26,8 @@ struct CarCardView: View {
     }
     .buttonStyle(.borderless)
     .buttonBorderShape(.roundedRectangle(radius: 20))
-    
   }
+
 }
 
 #Preview {
@@ -36,5 +37,5 @@ struct CarCardView: View {
     CarCardView(model: .kicks2021)
     CarCardView(model: .muranoHybrid2015)
   }
-  
+
 }

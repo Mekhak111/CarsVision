@@ -1,5 +1,5 @@
 //
-//  Car3dView.swift
+//  Car3DView.swift
 //  CarsVision
 //
 //  Created by Mekhak Ghapantsyan on 11/15/24.
@@ -8,21 +8,35 @@
 import RealityKit
 import SwiftUI
 
-struct CarModel: View {
+struct Car3DView: View {
   
   @Environment(\.appModel) private var appModel
   @Environment(\.openWindow) private var openWindow
   @Environment(\.dismissWindow) private var dismissWindow
-  
-  @State var carEnt:ModelEntity = ModelEntity()
-  @State var rotationA: Angle = .zero
-  @State var transformMatrix: Transform = Transform()
-  @State var isPickerOPened: Bool = false
-  @State var isWheelsOpens: Bool = false
-  
-  @State private var copies:[String] = []
+  @State private var viewModel = Car3DViewModel()
   
   var body: some View {
+    car3DContent
+      .gesture(dragGesture)
+      .onDisappear {
+        appModel.selectedColor = .clear
+        appModel.selectedMaterial = ""
+        appModel.materials.removeAll()
+      }
+      .onChange(of: appModel.selectedColor) { oldValue, newValue in
+        for i in 0..<(viewModel.carEnt.model?.materials.count ?? 0) {
+          if viewModel.copies[i] == appModel.selectedMaterial {
+            viewModel.carEnt.model?.materials[i] = SimpleMaterial(color: SimpleMaterial.Color(newValue), isMetallic: false)
+          }
+        }
+      }
+  }
+  
+}
+
+extension Car3DView {
+
+  private var car3DContent: some View {
     RealityView { content, attachments in
       if let car = try? await ModelEntity(named: appModel.carModel.modelName)
       {
@@ -34,69 +48,53 @@ struct CarModel: View {
           carAnchor.addChild(pickkerAttachment)
         }
         
-        carEnt = car
-        let sizes = getSizes()
-        let scale = calculateScale(for: sizes)
-        carEnt.scale = [Float(scale), Float(scale), Float(scale)]
-        transformMatrix = carEnt.transform
-        carAnchor.addChild(carEnt)
+        viewModel.carEnt = car
+        let sizes = viewModel.getSizes()
+        let scale = viewModel.calculateScale(for: sizes)
+        viewModel.carEnt.scale = [Float(scale), Float(scale), Float(scale)]
+        viewModel.transformMatrix = viewModel.carEnt.transform
+        carAnchor.addChild(viewModel.carEnt)
         car.model?.materials.forEach {
           
           appModel.materials.append($0.name ?? "")
-          copies.append($0.name ?? "")
+          viewModel.copies.append($0.name ?? "")
         }
         content.add(carAnchor)
         
       }
     } update: { content, attachments in
-      carEnt.components.set(InputTargetComponent())
-      carEnt.generateCollisionShapes(recursive: false)
+      viewModel.carEnt.components.set(InputTargetComponent())
+      viewModel.carEnt.generateCollisionShapes(recursive: false)
     } attachments: {
       attachment
     }
-    .gesture(dragGesture)
-    .onDisappear {
-      appModel.selectedColor = .clear
-      appModel.selectedMaterial = ""
-      appModel.materials.removeAll()
-    }
-    .onChange(of: appModel.selectedColor) { oldValue, newValue in
-      for i in 0..<(carEnt.model?.materials.count ?? 0) {
-        if copies[i] == appModel.selectedMaterial {
-          carEnt.model?.materials[i] = SimpleMaterial(color: SimpleMaterial.Color(newValue), isMetallic: false)
-        }
-      }
-    }
   }
-  
-}
 
-extension CarModel {
-  
+
   private var attachment: Attachment<some View> {
     Attachment(id: "ColorPicker") {
       VStack {
-        if !isWheelsOpens && !isPickerOPened {
+        if !viewModel.isWheelsOpens && !viewModel.isPickerOpened {
           Button{
-            if isPickerOPened {
+            if viewModel.isPickerOpened {
               dismissWindow.callAsFunction(id: "Picker")
             } else {
               openWindow.callAsFunction(id: "Picker")
             }
-            isPickerOPened.toggle()
+            viewModel.isPickerOpened.toggle()
           } label: {
-            Text(isPickerOPened ? "Close Picker" : "Open Picker")
+            Text(viewModel.isPickerOpened ? "Close Picker" : "Open Picker")
               .font(.title)
               .frame(width: 200)
           }
           
           Button {
-            if isWheelsOpens {
+            if viewModel.isWheelsOpens {
               dismissWindow.callAsFunction(id: "Wheels")
             } else {
               openWindow.callAsFunction(id: "Wheels")
             }
-            isWheelsOpens.toggle()
+            viewModel.isWheelsOpens.toggle()
           } label: {
             Text("Choose Wheels")
               .font(.title)
@@ -105,12 +103,12 @@ extension CarModel {
           
         } else {
           Button {
-            if isWheelsOpens {
+            if viewModel.isWheelsOpens {
               dismissWindow.callAsFunction(id: "Wheels")
-              isWheelsOpens.toggle()
+              viewModel.isWheelsOpens.toggle()
             } else {
               dismissWindow.callAsFunction(id: "Picker")
-              isPickerOPened.toggle()
+              viewModel.isPickerOpened.toggle()
             }
           } label: {
             Text("Close Whindows")
@@ -122,32 +120,18 @@ extension CarModel {
       }
     }
   }
-  
+
   private var dragGesture: some Gesture {
     DragGesture()
-      .targetedToEntity(carEnt)
+      .targetedToEntity(viewModel.carEnt)
       .onChanged { change in
-        rotationA.degrees += change.translation.width > 0 ? 3 : -3
-        var m1 = Transform(yaw: Float(rotationA.radians))
-        m1.scale = transformMatrix.scale
-        carEnt.transform.matrix = m1.matrix
+        print("rotate")
+        print(change.translation)
+        viewModel.rotationA.degrees += change.translation.width > 0 ? 3 : -3
+        var m1 = Transform(yaw: Float(viewModel.rotationA.radians))
+        m1.scale = viewModel.transformMatrix.scale
+        viewModel.carEnt.transform.matrix = m1.matrix
       }
-  }
-  
-  private func getSizes() -> [Double] {
-    let width = (carEnt.model?.mesh.bounds.max.x)! - (carEnt.model?.mesh.bounds.min.x)!
-    let height = (carEnt.model?.mesh.bounds.max.y)! - (carEnt.model?.mesh.bounds.min.y)!
-    let depth = (carEnt.model?.mesh.bounds.max.z)! - (carEnt.model?.mesh.bounds.min.z)!
-    let carSize: [Double] = [ Double(width) , Double(height), Double(depth)]
-    return carSize
-  }
-  
-  private func calculateScale(for array: [Double]) -> Double {
-    guard let maxElement = array.max(), maxElement > 0 else {
-      fatalError("Array must not be empty and should contain positive values.")
-    }
-    let scaleFactor = 5.0 / maxElement
-    return scaleFactor
   }
   
 }

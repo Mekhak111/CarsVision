@@ -5,8 +5,8 @@
 //  Created by Mekhak Ghapantsyan on 11/14/24.
 //
 
-import SwiftUI
 import RealityKit
+import SwiftUI
 
 @main
 struct CarsVisionApp: App {
@@ -18,7 +18,7 @@ struct CarsVisionApp: App {
       LunchScreen()
         .environment(appModel)
     }
-    
+
     WindowGroup(id: "Car") {
       CarModelInVolumetric()
         .environment(appModel)
@@ -48,5 +48,5 @@ struct CarsVisionApp: App {
     }
     .immersionStyle(selection: .constant(.full), in: .full)
   }
-  
+
 }
