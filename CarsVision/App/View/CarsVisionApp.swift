@@ -35,6 +35,15 @@ struct CarsVisionApp: App {
     .windowStyle(.plain)
     .defaultSize(CGSize(width: 400, height: 400))
     
+    WindowGroup(id: "Textures") {
+      TexturesView()
+        .environment(appModel)
+        .presentationCornerRadius(20)
+        .glassBackgroundEffect()
+    }
+    .windowStyle(.plain)
+    .defaultSize(CGSize(width: 800, height: 800))
+    
     WindowGroup(id: "Wheels") {
       WheelsSelectionView()
         .environment(appModel)

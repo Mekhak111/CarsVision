@@ -26,5 +26,6 @@ class AppModel {
   var materials: [String] = []
   var selectedMaterial: String = "Car"
   var selectedColor: Color = .red
+  var selectedTexture: String = ""
   
 }

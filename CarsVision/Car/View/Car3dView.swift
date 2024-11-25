@@ -30,6 +30,15 @@ struct Car3DView: View {
           }
         }
       }
+      .onChange(of: appModel.selectedTexture) { oldValue, newValue in
+        Task {
+          for i in 0..<(viewModel.carEnt.model?.materials.count ?? 0) {
+            if viewModel.copies[i] == appModel.selectedMaterial {
+              viewModel.carEnt.model?.materials[i] = await UnlitMaterial(texture: try TextureResource(named: newValue))
+            }
+          }
+        }
+      }
   }
   
 }
@@ -43,7 +52,7 @@ extension Car3DView {
         let carAnchor = AnchorEntity(world: [0, -1, -5])
         
         if let pickkerAttachment = attachments.entity(for: "ColorPicker") {
-          pickkerAttachment.position = [2, 1, 0]
+          pickkerAttachment.position = [2, 3, 0]
           pickkerAttachment.scale = [10,10,10]
           carAnchor.addChild(pickkerAttachment)
         }
