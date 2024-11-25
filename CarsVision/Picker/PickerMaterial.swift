@@ -10,6 +10,8 @@ import SwiftUI
 struct PickerMaterial: View {
 
   @Environment(\.appModel) private var appModel
+  @Environment(\.openWindow) private var openWindow
+
   @State var selectedMaterial: String = "Part Picker"
   @State var partColor: Color = .white
 
@@ -23,8 +25,15 @@ struct PickerMaterial: View {
         }
       }
       .padding(.bottom, 50)
-      ColorPicker("", selection: $partColor)
+      ColorPicker("Choose Color", selection: $partColor)
         .padding(.horizontal, 50)
+      Button {
+        openWindow.callAsFunction(id: "Textures")
+      } label: {
+        Text("Add Texture")
+      }
+      .padding()
+
     }
     .onChange(of: selectedMaterial) { _, material in
       appModel.selectedMaterial = material
