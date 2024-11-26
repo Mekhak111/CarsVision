@@ -259,6 +259,35 @@ enum NissanModel: String, Codable, CaseIterable {
     }
   }
   
+  var price: Double {
+      switch self {
+      case .kicks2019: return 21000.0
+      case .sentraSylphySL2018: return 19000.0
+      case .sylphyEV2018: return 28000.0
+      case .sentraSylphy2020: return 21000.0
+      case .tiida2017: return 15000.0
+      case .sentraSylphyEPower2021: return 26000.0
+      case .kicks2021: return 22000.0
+      case .muranoHybrid2015: return 27000.0
+      case .qashqai2018: return 24000.0
+      case .versaSedan2015: return 12000.0
+      case .zRZ34Pandem2023: return 48000.0
+      case .zRZ34Varis2023: return 50000.0
+      case .fairladyZRZ34_2023: return 43000.0
+      case .zNismo2024: return 55000.0
+      case .zProtoConcept2020: return 60000.0
+      case .zRocketBunny2003: return 30000.0
+      case .z370Nismo2015: return 40000.0
+      case .z370Coupe2018: return 37000.0
+      case .z370NFS2013: return 35000.0
+      case .z370_2013: return 34000.0
+      case .z350TopSecret2003: return 28000.0
+      case .z350Veliside2003: return 29000.0
+      case .z350_2006: return 24000.0
+      case .z350: return 23000.0
+      }
+  }
+  
   static var salonModels: [NissanModel] {
     return [
       NissanModel.sentraSylphySL2018,
@@ -272,4 +301,5 @@ enum NissanModel: String, Codable, CaseIterable {
       NissanModel.z350Veliside2003,
     ]
   }
+  
 }

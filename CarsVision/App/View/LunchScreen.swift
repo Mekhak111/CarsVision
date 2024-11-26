@@ -40,7 +40,11 @@ struct LunchScreen: View {
           }
         }
         
-        Button {
+        HoverButtonView(
+          primaryText: isAutoSalonOpened ? "Exit Autosalon" : "Visit AutoSalon",
+          secondaryText: isAutoSalonOpened ? "Explore in App" : "9 cars available",
+          iconName: isAutoSalonOpened ? "arrowshape.backward.circle.fill" : "car.circle.fill",
+          action: {
           Task {
             if isAutoSalonOpened {
               await dismissImmersiveSpace.callAsFunction()
@@ -49,10 +53,7 @@ struct LunchScreen: View {
             }
             isAutoSalonOpened.toggle()
           }
-        } label: {
-          Text(isAutoSalonOpened ? "Exit Auto Salon" : "Visit Auto Salon")
-        }
-        .padding(.top, 30)
+        })
       }
     }
   }
