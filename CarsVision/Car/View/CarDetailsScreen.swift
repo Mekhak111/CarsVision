@@ -39,20 +39,15 @@ struct CarDetailsScreen: View {
           .foregroundStyle(Color.white)
           .font(.title2)
         HStack {
-          Button {
+          HoverButtonView(primaryText: viewModel.isShowModel ? "Dismiss 3D Model" : "Show 3D Model", secondaryText: "", iconName: "car.fill") {
             viewModel.isShowModel.toggle()
             appModel.carModel = viewModel.carModel
             showWindow()
-          } label: {
-            Text(viewModel.isShowModel ? "Dismiss 3D Model" : "Show 3D Model")
           }
-          
-          Button {
+          HoverButtonView(primaryText: viewModel.isShowImmersive ? "Dismiss Imersive" : "Show Imersive", secondaryText: "", iconName: "figure.2.circle") {
             viewModel.isShowImmersive.toggle()
             appModel.carModel = viewModel.carModel
             showImmersiveSpace()
-          } label: {
-            Text(viewModel.isShowImmersive ? "Dismiss Imersive" : "Show Imersive")
           }
         }
       }
@@ -60,6 +55,7 @@ struct CarDetailsScreen: View {
         .resizable()
         .scaledToFit()
     }
+    .navigationBarBackButtonHidden(viewModel.isShowImmersive)
     .padding()
   }
 
