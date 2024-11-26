@@ -10,6 +10,9 @@ import SwiftUI
 struct LunchScreen: View {
   
   @Environment(\.openImmersiveSpace) private var openImmersiveSpace
+  @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
+  
+  @State var isAutoSalonOpened: Bool = false
   
   var body: some View {
     NavigationStack {
@@ -21,34 +24,35 @@ struct LunchScreen: View {
         Text("Adventure calls")
           .font(.extraLargeTitle2)
           .foregroundStyle(Color.white)
-        
-        ScrollView(.horizontal) {
-          HStack {
-            ForEach(NissanModel.allCases, id: \.name) { carType in
-              CarCardView(model: carType)
-                .glassBackgroundEffect()
-                .padding(16)
-                .frame(maxWidth: 400)
+        if !isAutoSalonOpened {
+          ScrollView(.horizontal) {
+            HStack {
+              ForEach(NissanModel.allCases, id: \.name) { carType in
+                CarCardView(model: carType)
+                  .glassBackgroundEffect()
+                  .padding(16)
+                  .frame(maxWidth: 400)
+              }
             }
-          }
-          .navigationDestination(for: NissanModel.self) { module in
-            CarDetailsScreen(viewModel: CarDetailsViewModel(carModel: module))
+            .navigationDestination(for: NissanModel.self) { module in
+              CarDetailsScreen(viewModel: CarDetailsViewModel(carModel: module))
+            }
           }
         }
         
         Button {
           Task {
-            await openImmersiveSpace.callAsFunction(id: "Autosalon")
+            if isAutoSalonOpened {
+              await dismissImmersiveSpace.callAsFunction()
+            } else {
+              await openImmersiveSpace.callAsFunction(id: "Autosalon")
+            }
+            isAutoSalonOpened.toggle()
           }
         } label: {
-          Text("Visit Auto Salon")
+          Text(isAutoSalonOpened ? "Exit Auto Salon" : "Visit Auto Salon")
         }
         .padding(.top, 30)
-      }
-      .background(alignment: Alignment(horizontal: .center, vertical: .center)) {
-        Image("car.background")
-          .resizable()
-          .scaledToFill()
       }
     }
   }

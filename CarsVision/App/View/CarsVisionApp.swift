@@ -17,6 +17,11 @@ struct CarsVisionApp: App {
     WindowGroup {
       LunchScreen()
         .environment(appModel)
+        .background(alignment: Alignment(horizontal: .center, vertical: .center)) {
+          Image("car.background")
+            .resizable()
+            .scaledToFill()
+        }
     }
 
     WindowGroup(id: "Car") {
@@ -24,7 +29,6 @@ struct CarsVisionApp: App {
         .environment(appModel)
     }
     .windowStyle(.volumetric)
-    .defaultSize(CGSize(width: 600, height: 600))
     
     WindowGroup(id: "Picker") {
       PickerMaterial()
