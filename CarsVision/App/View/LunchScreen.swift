@@ -9,17 +9,19 @@ import SwiftUI
 
 struct LunchScreen: View {
   
+  @Environment(\.openImmersiveSpace) private var openImmersiveSpace
+  
   var body: some View {
     NavigationStack {
       VStack {
         Text("Find Your Nissan")
           .font(.extraLargeTitle)
           .foregroundStyle(Color.white)
-
+        
         Text("Adventure calls")
           .font(.extraLargeTitle2)
           .foregroundStyle(Color.white)
-
+        
         ScrollView(.horizontal) {
           HStack {
             ForEach(NissanModel.allCases, id: \.name) { carType in
@@ -33,6 +35,15 @@ struct LunchScreen: View {
             CarDetailsScreen(viewModel: CarDetailsViewModel(carModel: module))
           }
         }
+        
+        Button {
+          Task {
+            await openImmersiveSpace.callAsFunction(id: "Autosalon")
+          }
+        } label: {
+          Text("Visit Auto Salon")
+        }
+        .padding(.top, 30)
       }
       .background(alignment: Alignment(horizontal: .center, vertical: .center)) {
         Image("car.background")

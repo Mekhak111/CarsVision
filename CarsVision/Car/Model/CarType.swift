@@ -8,7 +8,7 @@
 import Foundation
 
 enum NissanModel: String, Codable, CaseIterable {
-
+  
   case kicks2019
   case sentraSylphySL2018
   case sylphyEV2018
@@ -33,7 +33,7 @@ enum NissanModel: String, Codable, CaseIterable {
   case z350Veliside2003
   case z350_2006
   case z350
-
+  
   var name: String {
     switch self {
     case .kicks2019: "2019 Nissan Kicks Sport"
@@ -62,7 +62,7 @@ enum NissanModel: String, Codable, CaseIterable {
     case .z350: "Nissan 350Z"
     }
   }
-
+  
   var description: String {
     switch self {
     case .kicks2019:
@@ -115,7 +115,7 @@ enum NissanModel: String, Codable, CaseIterable {
       "The Nissan 350Z is a classic Z car delivering a thrilling driving experience with a focus on performance and style."
     }
   }
-
+  
   var horsepower: Int {
     switch self {
     case .kicks2019, .kicks2021: 122
@@ -130,12 +130,12 @@ enum NissanModel: String, Codable, CaseIterable {
       400
     case .zProtoConcept2020: 405
     case .zRocketBunny2003, .z350Veliside2003, .z350TopSecret2003, .z350_2006,
-      .z350:
+        .z350:
       287
     case .z370Nismo2015, .z370Coupe2018, .z370NFS2013, .z370_2013: 350
     }
   }
-
+  
   var technicalSpecifications: String {
     switch self {
     case .kicks2019, .kicks2021:
@@ -215,7 +215,7 @@ enum NissanModel: String, Codable, CaseIterable {
       Concept vehicle with retro-inspired design
       """
     case .zRocketBunny2003, .z350Veliside2003, .z350TopSecret2003, .z350_2006,
-      .z350:
+        .z350:
       """
       Engine: 3.5L V6
       Transmission: 6-speed manual or 5-speed automatic
@@ -229,7 +229,7 @@ enum NissanModel: String, Codable, CaseIterable {
       """
     }
   }
-
+  
   var modelName: String {
     switch self {
     case .kicks2019: "2019_Nissan_Kicks_Sport"
@@ -257,5 +257,19 @@ enum NissanModel: String, Codable, CaseIterable {
     case .z350_2006: "2006_Nissan_350Z"
     case .z350: "2006_Nissan_350Z"
     }
+  }
+  
+  static var salonModels: [NissanModel] {
+    return [
+      NissanModel.sentraSylphySL2018,
+      NissanModel.sylphyEV2018,
+      NissanModel.zRocketBunny2003,
+      NissanModel.z370Nismo2015,
+      NissanModel.z370Coupe2018,
+      NissanModel.z370NFS2013,
+      NissanModel.z370_2013,
+      NissanModel.z350TopSecret2003,
+      NissanModel.z350Veliside2003,
+    ]
   }
 }
