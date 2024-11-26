@@ -15,13 +15,8 @@ struct CarsVisionApp: App {
   
   var body: some SwiftUI.Scene {
     WindowGroup {
-      LunchScreen()
+      OrnamentView()
         .environment(appModel)
-        .background(alignment: Alignment(horizontal: .center, vertical: .center)) {
-          Image("car.background")
-            .resizable()
-            .scaledToFill()
-        }
     }
 
     WindowGroup(id: "Car") {
