@@ -56,6 +56,12 @@ struct CarsVisionApp: App {
         .environment(appModel)
     }
     .immersionStyle(selection: .constant(.full), in: .full)
+    
+    ImmersiveSpace(id: "Autosalon") {
+      AutoSalon()
+    }
+    .immersionStyle(selection: .constant(.full), in: .full)
+
   }
 
 }
