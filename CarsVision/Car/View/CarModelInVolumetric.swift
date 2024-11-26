@@ -17,10 +17,10 @@ struct CarModelInVolumetric: View {
     Model3D(named: appModel.carModel.modelName) { car in
       car
         .resizable()
-        .frame(maxWidth: 200)
-        .frame(maxHeight: 200)
-        .frame(maxDepth: 300)
-        .padding()
+        .frame(maxWidth: 600)
+        .frame(maxHeight: 600)
+        .frame(maxDepth: 600)
+        .padding(100)
         .rotation3DEffect(
           Rotation3D(
             eulerAngles: EulerAngles(x: Angle2D(.zero), y: rotation, z: Angle2D(.zero), order: .xyz))
