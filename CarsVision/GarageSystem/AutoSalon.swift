@@ -39,6 +39,9 @@ extension AutoSalon {
         let sizes = getSizes(carEnt: auto)
         let scale = calculateScale(for: sizes)
         auto.scale = [Float(scale), Float(scale), Float(scale)]
+        auto.components.set(HoverEffectComponent())
+        auto.components.set(InputTargetComponent())
+        auto.generateCollisionShapes(recursive: true)
         autoSalon.addChild(auto)
       }
     }
