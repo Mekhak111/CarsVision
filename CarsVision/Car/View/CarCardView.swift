@@ -9,13 +9,12 @@ import SwiftUI
 
 struct CarCardView: View {
 
+  @Environment(\.appModel) var appModel
+  
   let model: NissanModel
 
   var body: some View {
     NavigationLink(value: model) {
-//    Button {
-//      //
-//    } label: {
       VStack {
         Text(model.name)
           .font(.title)
@@ -28,8 +27,9 @@ struct CarCardView: View {
       }
       .padding()
     }
-    .buttonBorderShape(.roundedRectangle(radius: 20))
-    .buttonStyle(ImageCollectionButtonStyle())
+    .buttonStyle(
+      ScaleHoverButtonStyle(isSelected: appModel.carModel == model)
+    )
   }
 
 }

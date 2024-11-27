@@ -1,19 +1,18 @@
 //
-//  Garage.swift
+//  Nature.swift
 //  CarsVision
 //
-//  Created by Mekhak Ghapantsyan on 11/21/24.
+//  Created by Narek Aslanyan on 27.11.24.
 //
 
-import RealityKit
-import RealityKitContent
 import SwiftUI
+import RealityKit
 
-struct Garage: View {
+struct Nature: View {
 
   var body: some View {
     RealityView { content in
-      guard let resource = try? await TextureResource(named: "car_workshop_8k") else {
+      guard let resource = try? await TextureResource(named: "nature4k") else {
         fatalError("Unable to load car texture.")
       }
       var material = UnlitMaterial()
@@ -30,8 +29,4 @@ struct Garage: View {
     }
   }
 
-}
-
-#Preview {
-  Garage()
 }

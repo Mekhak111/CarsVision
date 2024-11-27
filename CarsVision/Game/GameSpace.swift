@@ -26,58 +26,48 @@ struct GameSpace: View {
           self.road = road
         }
         road.position = [0, 0, 0]
-        
+
         let radians = 90 * Float.pi / 180.0
-        road.transform.rotation = simd_quatf(
-          angle: radians, axis: SIMD3<Float>(0, 1, 0))
-        
-        var roadPhysicsBody = PhysicsBodyComponent()
-        roadPhysicsBody.mode = .static
-        road.physicsBody = roadPhysicsBody
-        
+        road.transform.rotation = simd_quatf(angle: radians, axis: SIMD3<Float>(0, 1, 0))
+
         content.add(road)
-        if let car = try? await ModelEntity(named: appModel.carModel.modelName) {
-          guard let attachment = attachments.entity(for: "attachment") else {
-            return
-          }
-          attachment.position = SIMD3<Float>(0, 120, 0)
-          attachment.scale = [1000, 1000, 1000]
-          car.addChild(attachment)
-          
-          viewModel.carEnt = car
-          let sizes = viewModel.getSizes()
-          let carWidth = sizes[0]
-          let roadWidth = (road.model?.mesh.bounds.max.x ?? 0) - (road.model?.mesh.bounds.min.x ?? 0)
-          let relativeScale = Double(roadWidth) / carWidth
-          let scale = viewModel.calculateScale(for: sizes) * relativeScale
-          
-          viewModel.carEnt.position = [0, 10, 120]
-          viewModel.carEnt.scale = [Float(scale), Float(scale), Float(scale)]
-          let radians = 90 * Float.pi / 180.0
-          viewModel.carEnt.transform.rotation = simd_quatf(
-            angle: radians, axis: SIMD3<Float>(0, 1, 0))
-          var carPhysicsBody = PhysicsBodyComponent()
-          carPhysicsBody.mode = .dynamic
-          carPhysicsBody.isAffectedByGravity = true
-          carPhysicsBody.massProperties.mass = 1
-          viewModel.carEnt.physicsBody = carPhysicsBody
-          road.addChild(viewModel.carEnt)
-          let gameObject = GameObject(entity: viewModel.carEnt)
-          GameController.shared.carObject = gameObject
-        }
+        guard let car = try? await ModelEntity(named: appModel.carModel.modelName),
+          let attachment = attachments.entity(for: "attachment")
+        else { return }
+        attachment.position = SIMD3<Float>(0, 240, 0)
+        attachment.scale = [1000, 1000, 1000]
+        car.addChild(attachment)
+
+        viewModel.carEnt = car
+        let sizes = viewModel.getSizes()
+        let carWidth = sizes[0]
+        let roadWidth = (road.model?.mesh.bounds.max.x ?? 0) - (road.model?.mesh.bounds.min.x ?? 0)
+        let relativeScale = Double(roadWidth) / carWidth
+        let scale = viewModel.calculateScale(for: sizes) * relativeScale
+
+        viewModel.carEnt.position = [120, 10, 120]
+        viewModel.carEnt.scale = [Float(scale), Float(scale), Float(scale)]
+        let carRadians = 90 * Float.pi / 180.0
+        viewModel.carEnt.transform.rotation = simd_quatf(
+          angle: carRadians, axis: SIMD3<Float>(0, 1, 0))
+
+        road.addChild(viewModel.carEnt)
+        let gameObject = GameObject(entity: viewModel.carEnt)
+        GameController.shared.carObject = gameObject
         ARSession.shared.startSession(systems: [
           HeadPose.shared, HandTracking.shared,
         ])
+        setupHandTracking(content: content)
       } attachments: {
-        if appModel.state == .placeCar {
-          Attachment(id: "attachment") {
+        Attachment(id: "attachment") {
+          if appModel.state == .placeCar {
             placeCarButton
           }
         }
       }
     }
   }
-  
+
   private var placeCarButton: some View {
     Button {
       placeObjectAtHeadPose()

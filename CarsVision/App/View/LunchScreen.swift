@@ -17,6 +17,8 @@ struct LunchScreen: View {
   var body: some View {
     NavigationStack {
       VStack {
+        Spacer()
+        
         Text("Find Your Nissan")
           .font(.extraLargeTitle)
           .foregroundStyle(Color.white)
@@ -24,27 +26,35 @@ struct LunchScreen: View {
         Text("Adventure calls")
           .font(.extraLargeTitle2)
           .foregroundStyle(Color.white)
+        
+        Spacer()
+        
         if !isAutoSalonOpened {
           ScrollView(.horizontal) {
-            HStack {
+            Spacer()
+            HStack(spacing: 0) {
               ForEach(NissanModel.allCases, id: \.name) { carType in
                 CarCardView(model: carType)
-                  .glassBackgroundEffect()
-                  .padding(16)
-                  .frame(maxWidth: 400)
+                  .frame(width: 300, height: 250)
+                  .padding(.horizontal, 30)
               }
             }
+            .padding(.horizontal, 30)
             .navigationDestination(for: NissanModel.self) { module in
               CarDetailsScreen(viewModel: CarDetailsViewModel(carModel: module))
             }
+            Spacer()
           }
+          .frame(height: 350)
         }
+        
+        Spacer()
         
         HoverButtonView(
           primaryText: isAutoSalonOpened ? "Exit Autosalon" : "Visit AutoSalon",
           secondaryText: isAutoSalonOpened ? "Explore in App" : "9 cars available",
-          iconName: isAutoSalonOpened ? "arrowshape.backward.circle.fill" : "car.circle.fill",
-          action: {
+          iconName: isAutoSalonOpened ? "arrowshape.backward.circle.fill" : "car.circle.fill"
+        ) {
           Task {
             if isAutoSalonOpened {
               await dismissImmersiveSpace.callAsFunction()
@@ -53,7 +63,9 @@ struct LunchScreen: View {
             }
             isAutoSalonOpened.toggle()
           }
-        })
+        }
+        
+        Spacer()
       }
     }
   }

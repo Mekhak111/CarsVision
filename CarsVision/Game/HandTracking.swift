@@ -69,11 +69,11 @@ class HandTracking: ARSysteming {
   }
 
   var state: State {
-    return trackingState
+    trackingState
   }
 
   var provider: DataProvider {
-    return handTracking
+    handTracking
   }
 
   var isProviderSupported: Bool {
@@ -85,7 +85,7 @@ class HandTracking: ARSysteming {
   }
 
   func getHandInfo(name: String) -> HandInfo? {
-    return handEntities[name]
+    handEntities[name]
   }
 
   // MARK: Collision handling
