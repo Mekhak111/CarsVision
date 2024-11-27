@@ -36,6 +36,10 @@ struct GameSpace: View {
         else { return }
         attachment.position = SIMD3<Float>(0, 240, 0)
         attachment.scale = [1000, 1000, 1000]
+        
+        let attachmentRadians = 180 * Float.pi / 180.0
+        attachment.transform.rotation = simd_quatf(angle: attachmentRadians, axis: SIMD3<Float>(0, 1, 0))
+        
         car.addChild(attachment)
 
         viewModel.carEnt = car

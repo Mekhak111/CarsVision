@@ -84,7 +84,7 @@ struct CarsVisionApp: App {
           CarsVisionApp.openedWindows.remove(.game)
         }
     }
-    .defaultSize(CGSize(width: 300, height: 300))
+    .defaultSize(CGSize(width: 400, height: 400))
 
     ImmersiveSpace(id: appModel.immersiveSpaceID) {
       GarageSystem()
