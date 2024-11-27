@@ -46,6 +46,7 @@ struct CarDetailsScreen: View {
           } label: {
             Text(viewModel.isShowModel ? "Dismiss 3D Model" : "Show 3D Model")
           }
+//          .buttonStyle(HighlightingButtonStyle())
           
           Button {
             viewModel.isShowImmersive.toggle()
@@ -54,11 +55,14 @@ struct CarDetailsScreen: View {
           } label: {
             Text(viewModel.isShowImmersive ? "Dismiss Imersive" : "Show Imersive")
           }
+//          .buttonStyle(HighlightingButtonStyle())
         }
       }
-      Image("nissan.gtr")
+      Image(.nissan)
         .resizable()
+        .renderingMode(.template)
         .scaledToFit()
+        .foregroundStyle(.white)
     }
     .padding()
   }

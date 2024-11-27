@@ -15,8 +15,14 @@ class Car3DViewModel {
   var carEnt: ModelEntity = ModelEntity()
   var rotationA: Angle = .zero
   var transformMatrix: Transform = Transform()
-  var isPickerOpened: Bool = false
-  var isWheelsOpens: Bool = false
+  
+  var isPickerOpened: Bool = CarsVisionApp.getOpenedWindows().contains(.picker)
+  var isWheelsOpened: Bool = CarsVisionApp.getOpenedWindows().contains(.wheels)
+  var isGameOpened: Bool = CarsVisionApp.getOpenedWindows().contains(.game)
+  
+  var hasOpenedWindows: Bool {
+    isPickerOpened || isWheelsOpened || isGameOpened
+  }
   
   func getSizes() -> [Double] {
     let width =

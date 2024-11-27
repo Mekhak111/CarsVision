@@ -13,19 +13,23 @@ struct CarCardView: View {
 
   var body: some View {
     NavigationLink(value: model) {
+//    Button {
+//      //
+//    } label: {
       VStack {
         Text(model.name)
           .font(.title)
           .padding(.bottom, 10)
           .foregroundStyle(Color.white)
+        
         Text(model.description)
           .font(.headline)
-          .padding(16)
           .foregroundStyle(Color.white)
       }
+      .padding()
     }
-    .buttonStyle(.borderless)
     .buttonBorderShape(.roundedRectangle(radius: 20))
+    .buttonStyle(ImageCollectionButtonStyle())
   }
 
 }
