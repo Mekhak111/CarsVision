@@ -21,23 +21,31 @@ struct AutoSalon: View {
       }
       autoSalon.position = [0,0,-8]
       content.add(autoSalon)
-      let positions = generateCarPositions()
-      for model in salonModels {
-        if let auto = try? await ModelEntity(named: model.modelName) {
-          auto.position = positions[carOrder]
-          carOrder += 1
-          let sizes = getSizes(carEnt: auto)
-          let scale = calculateScale(for: sizes)
-          auto.scale = [Float(scale), Float(scale), Float(scale)]
-          autoSalon.addChild(auto)
-        }
-        
-      }
+    }
+    .task {
+      await getCars()
     }
   }
 }
 
 extension AutoSalon {
+  
+  func getCars() async {
+    let positions = generateCarPositions()
+    for model in salonModels {
+      if let auto = try? await ModelEntity(named: model.modelName) {
+        auto.position = positions[carOrder]
+        carOrder += 1
+        let sizes = getSizes(carEnt: auto)
+        let scale = calculateScale(for: sizes)
+        auto.scale = [Float(scale), Float(scale), Float(scale)]
+        auto.components.set(HoverEffectComponent())
+        auto.components.set(InputTargetComponent())
+        auto.generateCollisionShapes(recursive: true)
+        autoSalon.addChild(auto)
+      }
+    }
+  }
   
   func getSizes(carEnt: ModelEntity) -> [Double] {
     let width =
@@ -59,7 +67,6 @@ extension AutoSalon {
   }
   
   func generateCarPositions() -> [SIMD3<Float>]{
-    
     let initialPosition: SIMD3<Float> = [-8,0.3,-5]
     var result: [SIMD3<Float>] = []
     result.append(initialPosition)
