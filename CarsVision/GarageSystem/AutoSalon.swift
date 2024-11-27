@@ -13,7 +13,9 @@ struct AutoSalon: View {
   @State var autoSalon: ModelEntity = ModelEntity()
   @State var carOrder: Int = 0
   @State var salonModels = NissanModel.salonModels
-  
+  @State var positions: [SIMD3<Float>] = []
+  @Environment(\.appModel) private var appModel
+
   var body: some View {
     RealityView { content in
       if let autoSalon = try? await ModelEntity(named: "Salon3") {
@@ -25,13 +27,21 @@ struct AutoSalon: View {
     .task {
       await getCars()
     }
+    .gesture(
+      TapGesture().targetedToAnyEntity().onEnded { value in
+        print(value.entity.position)
+        guard let index = positions.firstIndex(of: value.entity.position) else { return }
+        appModel.carModel = salonModels[index]
+        print(appModel.carModel)
+      }
+    )
   }
 }
 
 extension AutoSalon {
   
   func getCars() async {
-    let positions = generateCarPositions()
+    positions = generateCarPositions()
     for model in salonModels {
       if let auto = try? await ModelEntity(named: model.modelName) {
         auto.position = positions[carOrder]

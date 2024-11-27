@@ -9,10 +9,11 @@ import SwiftUI
 
 struct PriceListView: View {
   
-  let models = NissanModel.allCases
-  let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
-  
+  @Environment(\.appModel) private var appModel
   @State private var selectedModel: NissanModel? = nil
+
+  let models = NissanModel.allCases
+  let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]  
   
   var body: some View {
     ZStack {
@@ -35,6 +36,9 @@ struct PriceListView: View {
         }
         .padding()
       }
+    }
+    .onChange(of: appModel.carModel) { oldValue, newValue in
+      selectedModel = newValue
     }
   }
   
