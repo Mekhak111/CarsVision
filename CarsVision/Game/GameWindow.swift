@@ -14,6 +14,7 @@ struct GameWindow: View {
   @Environment(\.openWindow) var openWindow
   @Environment(\.dismissWindow) var dismissWindow
   @Environment(\.appModel) private var appModel
+  @State private var isShowImmersiveSpace: Bool = false
 
   var body: some View {
     VStack {
@@ -37,6 +38,9 @@ struct GameWindow: View {
       case .end:
         restartGameButton
       }
+      if isShowImmersiveSpace {
+        dismissImmersiveSpaceButton
+      }
     }
     .padding()
   }
@@ -46,10 +50,13 @@ struct GameWindow: View {
       self.appModel.state = .placeCar
       GameController.shared.changeState(to: appModel.state)
 
-      Task {
-        await dismissImmersiveSpace()
-        await openImmersiveSpace(id: "game_space")
+      if !isShowImmersiveSpace {
+        Task {
+          await dismissImmersiveSpace()
+          await openImmersiveSpace(id: "game_space")
+        }
       }
+      isShowImmersiveSpace = true
     }) {
       Text("Start Placing")
         .font(.largeTitle)
@@ -147,6 +154,23 @@ struct GameWindow: View {
     }
     .padding()
     .buttonStyle(.bordered)
+  }
+  
+  private var dismissImmersiveSpaceButton: some View {
+    Button {
+      Task {
+        await dismissImmersiveSpace()
+        isShowImmersiveSpace = false
+        self.appModel.state = .start
+        GameController.shared.changeState(to: appModel.state)
+      }
+    } label: {
+      Text("Dismiss Immersive")
+        .font(.largeTitle)
+        .fontWeight(.regular)
+        .padding()
+        .cornerRadius(8)
+    }
   }
   
 }
