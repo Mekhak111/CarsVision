@@ -9,6 +9,8 @@ import SwiftUI
 
 struct CarCardView: View {
 
+  @Environment(\.appModel) var appModel
+  
   let model: NissanModel
 
   var body: some View {
@@ -18,14 +20,16 @@ struct CarCardView: View {
           .font(.title)
           .padding(.bottom, 10)
           .foregroundStyle(Color.white)
+        
         Text(model.description)
           .font(.headline)
-          .padding(16)
           .foregroundStyle(Color.white)
       }
+      .padding()
     }
-    .buttonStyle(.borderless)
-    .buttonBorderShape(.roundedRectangle(radius: 20))
+    .buttonStyle(
+      ScaleHoverButtonStyle(isSelected: appModel.carModel == model)
+    )
   }
 
 }

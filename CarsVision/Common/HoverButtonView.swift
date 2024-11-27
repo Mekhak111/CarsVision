@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct HoverButtonView: View {
-  
+
   var primaryText: String
   var secondaryText: String
   var iconName: String
-  var action: () -> Void = { }
-  
+  var action: () -> Void = {}
+
   var body: some View {
     Button(action: action) {
       HStack(spacing: 2) {
@@ -25,89 +25,95 @@ struct HoverButtonView: View {
     .buttonStyle(HoverButtonStyle())
     .hoverEffectGroup()
   }
-  
-  struct HoverButtonStyle: ButtonStyle {
-    @Environment(\.accessibilityReduceMotion) var reduceMotion
-    func makeBody(configuration: Configuration) -> some View {
-      configuration.label
-        .background {
-          ZStack(alignment: .leading) {
-            Capsule()
+
+}
+struct HoverButtonStyle: ButtonStyle {
+
+  @Environment(\.accessibilityReduceMotion) var reduceMotion
+
+  func makeBody(configuration: Configuration) -> some View {
+    configuration.label
+      .background {
+        ZStack(alignment: .leading) {
+          Capsule()
+            .fill(.thinMaterial)
+            .hoverEffect(.highlight)
+            .hoverEffect(reduceMotion ? HoverEffect(FadeEffect()) : HoverEffect(.empty))
+          if reduceMotion {
+            Circle()
               .fill(.thinMaterial)
               .hoverEffect(.highlight)
-              .hoverEffect(
-                reduceMotion ? HoverEffect(FadeEffect()) : HoverEffect(.empty))
-            if reduceMotion {
-              Circle()
-                .fill(.thinMaterial)
-                .hoverEffect(.highlight)
-                .hoverEffect(FadeEffect(from: 1, to: 0))
-            }
+              .hoverEffect(FadeEffect(from: 1, to: 0))
           }
         }
-        .hoverEffect(
-          reduceMotion
-          ? HoverEffect(.empty)
-          : HoverEffect(ExpandEffect())
-        )
-    }
+      }
+      .hoverEffect(reduceMotion ? HoverEffect(.empty) : HoverEffect(ExpandEffect()))
   }
-  
-  struct ExpandEffect: CustomHoverEffect {
-    func body(content: Content) -> some CustomHoverEffect {
-      content.hoverEffect { effect, isActive, proxy in
-        effect.animation(.default.delay(isActive ? 0.8 : 0.2)) {
-          $0.clipShape(.capsule.size(
+}
+
+struct ExpandEffect: CustomHoverEffect {
+
+  func body(content: Content) -> some CustomHoverEffect {
+    content.hoverEffect { effect, isActive, proxy in
+      effect.animation(.default.delay(isActive ? 0.8 : 0.2)) {
+        $0.clipShape(
+          .capsule.size(
             width: isActive ? proxy.size.width : proxy.size.height,
             height: proxy.size.height,
             anchor: .leading
           ))
-        }.scaleEffect(isActive ? 1.05 : 1.0)
+      }
+      .scaleEffect(isActive ? 1.05 : 1.0)
+    }
+  }
+
+}
+
+struct FadeEffect: CustomHoverEffect {
+
+  var from: Double = 0
+  var to: Double = 1
+
+  func body(content: Content) -> some CustomHoverEffect {
+    content.hoverEffect { effect, isActive, _ in
+      effect.animation(.default.delay(isActive ? 0.8 : 0.2)) {
+        $0.opacity(isActive ? to : from)
       }
     }
   }
-  
-  struct FadeEffect: CustomHoverEffect {
-    var from: Double = 0
-    var to: Double = 1
-    
-    func body(content: Content) -> some CustomHoverEffect {
-      content.hoverEffect { effect, isActive, _ in
-        effect.animation(.default.delay(isActive ? 0.8 : 0.2)) {
-          $0.opacity(isActive ? to : from)
-        }
-      }
-    }
+}
+
+struct HoverIconView: View {
+
+  var iconName: String
+
+  var body: some View {
+    Image(systemName: iconName)
+      .resizable()
+      .scaledToFit()
+      .frame(
+        width: 44,
+        height: 44
+      )
+      .padding(6)
   }
-  
-  struct HoverIconView: View {
-    var iconName: String
-    var body: some View {
-      Image(systemName: iconName)
-        .resizable()
-        .scaledToFit()
-        .frame(
-          width: 44,
-          height: 44
-        )
-        .padding(6)
+}
+
+struct HoverDetailView: View {
+
+  var primaryText: String
+  var secondaryText: String
+
+  var body: some View {
+    VStack(alignment: .leading) {
+      Text(primaryText)
+        .font(.body)
+        .foregroundStyle(.primary)
+      Text(secondaryText)
+        .font(.footnote)
+        .foregroundStyle(.tertiary)
     }
-  }
-  
-  struct HoverDetailView: View {
-    var primaryText: String
-    var secondaryText: String
-    var body: some View {
-      VStack(alignment: .leading) {
-        Text(primaryText)
-          .font(.body)
-          .foregroundStyle(.primary)
-        Text(secondaryText)
-          .font(.footnote)
-          .foregroundStyle(.tertiary)
-      }
-      .padding(.trailing, 24)
-    }
+    .padding(.trailing, 24)
   }
 }
 

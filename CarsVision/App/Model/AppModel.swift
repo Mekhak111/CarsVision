@@ -26,6 +26,7 @@ class AppModel {
   var materials: [String] = []
   var selectedMaterial: String = "Car"
   var selectedColor: Color = .red
+  var state: GameState = .start
   var selectedTexture: String = ""
   
 }

@@ -5,6 +5,8 @@
 //  Created by Mekhak Ghapantsyan on 11/21/24.
 //
 
+import Foundation
+import RealityKit
 import SwiftUI
 
 struct PickerMaterial: View {
@@ -28,7 +30,7 @@ struct PickerMaterial: View {
       ColorPicker("Choose Color", selection: $partColor)
         .padding(.horizontal, 50)
       Button {
-        openWindow.callAsFunction(id: "Textures")
+        openOptionWindow(Window.textures)
       } label: {
         Text("Add Texture")
       }
@@ -40,6 +42,14 @@ struct PickerMaterial: View {
     }
     .onChange(of: partColor) { _, color in
       appModel.selectedColor = color
+    }
+  }
+  
+  func openOptionWindow(_ window: Window) {
+    CarsVisionApp.openWindowIfCan(by: window) {
+      Task { @MainActor in
+        openWindow(id: window.rawValue)
+      }
     }
   }
 
