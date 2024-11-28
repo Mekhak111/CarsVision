@@ -27,7 +27,7 @@ struct GameSpace: View {
         }
         road.position = [0, 0, 0]
 
-        let radians = 90 * Float.pi / 180.0
+        let radians = Math.degreesToRadians(90)
         road.transform.rotation = simd_quatf(angle: radians, axis: SIMD3<Float>(0, 1, 0))
 
         content.add(road)
@@ -37,7 +37,7 @@ struct GameSpace: View {
         attachment.position = SIMD3<Float>(0, 240, 0)
         attachment.scale = [1000, 1000, 1000]
         
-        let attachmentRadians = 180 * Float.pi / 180.0
+        let attachmentRadians = Math.degreesToRadians(180)
         attachment.transform.rotation = simd_quatf(angle: attachmentRadians, axis: SIMD3<Float>(0, 1, 0))
         
         car.addChild(attachment)
@@ -51,7 +51,7 @@ struct GameSpace: View {
 
         viewModel.carEnt.position = [120, 10, 120]
         viewModel.carEnt.scale = [Float(scale), Float(scale), Float(scale)]
-        let carRadians = 90 * Float.pi / 180.0
+        let carRadians = Math.degreesToRadians(90)
         viewModel.carEnt.transform.rotation = simd_quatf(
           angle: carRadians, axis: SIMD3<Float>(0, 1, 0))
 
