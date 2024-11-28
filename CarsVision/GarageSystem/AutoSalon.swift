@@ -13,7 +13,9 @@ struct AutoSalon: View {
   @State var autoSalon: ModelEntity = ModelEntity()
   @State var carOrder: Int = 0
   @State var salonModels = NissanModel.salonModels
-  
+  @State var positions: [SIMD3<Float>] = []
+  @Environment(\.appModel) private var appModel
+
   var body: some View {
     RealityView { content in
       if let autoSalon = try? await ModelEntity(named: "Salon3") {
@@ -21,23 +23,39 @@ struct AutoSalon: View {
       }
       autoSalon.position = [0,0,-8]
       content.add(autoSalon)
-      let positions = generateCarPositions()
-      for model in salonModels {
-        if let auto = try? await ModelEntity(named: model.modelName) {
-          auto.position = positions[carOrder]
-          carOrder += 1
-          let sizes = getSizes(carEnt: auto)
-          let scale = calculateScale(for: sizes)
-          auto.scale = [Float(scale), Float(scale), Float(scale)]
-          autoSalon.addChild(auto)
-        }
-        
-      }
     }
+    .task {
+      await getCars()
+    }
+    .gesture(
+      TapGesture().targetedToAnyEntity().onEnded { value in
+        print(value.entity.position)
+        guard let index = positions.firstIndex(of: value.entity.position) else { return }
+        appModel.carModel = salonModels[index]
+        print(appModel.carModel)
+      }
+    )
   }
 }
 
 extension AutoSalon {
+  
+  func getCars() async {
+    positions = generateCarPositions()
+    for model in salonModels {
+      if let auto = try? await ModelEntity(named: model.modelName) {
+        auto.position = positions[carOrder]
+        carOrder += 1
+        let sizes = getSizes(carEnt: auto)
+        let scale = calculateScale(for: sizes)
+        auto.scale = [Float(scale), Float(scale), Float(scale)]
+        auto.components.set(HoverEffectComponent())
+        auto.components.set(InputTargetComponent())
+        auto.generateCollisionShapes(recursive: true)
+        autoSalon.addChild(auto)
+      }
+    }
+  }
   
   func getSizes(carEnt: ModelEntity) -> [Double] {
     let width =
@@ -59,7 +77,6 @@ extension AutoSalon {
   }
   
   func generateCarPositions() -> [SIMD3<Float>]{
-    
     let initialPosition: SIMD3<Float> = [-8,0.3,-5]
     var result: [SIMD3<Float>] = []
     result.append(initialPosition)
