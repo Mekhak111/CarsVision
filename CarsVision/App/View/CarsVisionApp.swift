@@ -27,6 +27,10 @@ struct CarsVisionApp: App {
 
   @State private var appModel = AppModel()
 
+  private let session = ARKitSession()
+  private let provider = HandTrackingProvider()
+  private let rootEntity = Entity()
+
   var body: some SwiftUI.Scene {
     WindowGroup {
       OrnamentView()
@@ -104,6 +108,41 @@ struct CarsVisionApp: App {
     }
     .immersionStyle(selection: .constant(.full), in: .full)
 
+//    handTrackingImmersiveSpace
+  }
+
+  private var handTrackingImmersiveSpace: some SwiftUI.Scene {
+    ImmersiveSpace(id: "HandTracking") {
+      RealityView { content in
+        content.add(rootEntity)
+        for chirality in [HandAnchor.Chirality.left, .right] {
+          for jointName in HandSkeleton.JointName.allCases {
+            let jointEntity = ModelEntity(
+              mesh: .generateSphere(radius: 0.006),
+              materials: [SimpleMaterial()])
+            jointEntity.name = "\(jointName)\(chirality)"
+            rootEntity.addChild(jointEntity)
+          }
+        }
+      }
+      .task { try? await session.run([provider]) }
+      .task {
+        for await update in provider.anchorUpdates {
+          let handAnchor = update.anchor
+          for jointName in HandSkeleton.JointName.allCases {
+            guard let joint = handAnchor.handSkeleton?.joint(jointName),
+              let jointEntity = rootEntity.findEntity(named: "\(jointName)\(handAnchor.chirality)")
+            else {
+              continue
+            }
+            jointEntity.setTransformMatrix(
+              handAnchor.originFromAnchorTransform * joint.anchorFromJointTransform,
+              relativeTo: nil)
+          }
+        }
+      }
+    }
+    .upperLimbVisibility(.hidden)
   }
 
   static func getOpenedWindows() -> Set<Window> {

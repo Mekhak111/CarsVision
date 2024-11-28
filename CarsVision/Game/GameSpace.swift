@@ -131,6 +131,12 @@ struct GameSpace: View {
         GameController.shared.changeDirection(by: 10.0)
       }
     }
+    
+    HandTracking.shared.onGestureCallBack = { gesture, pose3D in
+      if gesture == .heart {
+        // Add action for heart gesture
+      }
+    }
 
     HandTracking.shared.setup()
   }
